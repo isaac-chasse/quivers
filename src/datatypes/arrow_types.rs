@@ -45,3 +45,28 @@ impl ArrowTypes {
     /// Represents an Arrow UTF-8 encoded string data type. 
     pub const STRING_TYPE: DataType = DataType::Utf8;
 }
+
+#[test]
+fn test_boolean_type() {
+    assert_eq!(ArrowTypes::BOOLEAN_TYPE, DataType::Boolean);
+}
+
+#[test]
+fn test_int64_type() {
+    assert_eq!(ArrowTypes::INT64_TYPE, DataType::Int64);
+}
+
+#[test]
+fn test_uint64_type() {
+    assert_eq!(ArrowTypes::UINT64_TYPE, DataType::UInt64);
+}
+
+#[test]
+fn test_double_type() {
+    assert_eq!(ArrowTypes::DOUBLE_TYPE, DataType::Float64);
+}
+
+#[test]
+fn test_string_type() {
+    assert_eq!(ArrowTypes::STRING_TYPE, DataType::Utf8);
+}

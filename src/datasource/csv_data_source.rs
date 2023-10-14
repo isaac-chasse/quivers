@@ -1,12 +1,31 @@
-use std::{fs::File, io::{self, BufReader}};
+use std::fs::File;
 use arrow::datatypes::DataType;
 use crate::datatypes::{schema::{Schema, Field}, record_batch::RecordBatch};
+
+use super::DataSource;
 
 pub struct CsvDataSource {
     pub filename: String,
     pub schema: Option<Schema>,
     pub has_headers: bool,
     pub batch_size: usize,
+}
+
+impl DataSource for CsvDataSource {
+    fn schema(&self) -> Schema {
+        match &self.schema {
+            Some(existing_schema) => existing_schema.clone(),
+            None => {
+                let inferred_schema = self.infer_schema().expect("Failed to infer schema from CsvDataSource");
+                // NOTE: Could store the inferred schema to self.schema if it makes sense later
+                inferred_schema
+            }
+        }
+    }
+
+    fn scan(&self, projection: Vec<String>) -> Box<dyn Iterator<Item = RecordBatch>> {
+        todo!()        
+    }
 }
 
 impl CsvDataSource {
@@ -36,29 +55,6 @@ impl CsvDataSource {
 
         Ok(Schema { fields })
     }
-
-    pub fn schema(&self) -> Result<Schema, csv::Error> {
-        match &self.schema {
-            Some(schema) => Ok(schema.clone()),
-            None => self.infer_schema(),
-        }
-    }
-
-    pub fn scan(&self, projection: Vec<String>) -> Result<Box<dyn Iterator<Item = Result<RecordBatch, csv::Error>>>, csv::Error> {
-        // might want to specify error here if read fails
-        let file = File::open(&self.filename)?; 
-        let rdr = BufReader::new(file);
-
-        // Here we need to implement our logic for handling a projection, creating RecordBatches,
-        // and managing batch sizes accorinding to the requirements defined by an instance of
-        // [`CsvDataSource`].
-        //
-        // We are returning a dummy variable right now for temporary completeness.
-        Ok(Box::new(std::iter::once(Err(csv::Error::from(io::Error::new(
-            io::ErrorKind::Other,
-            "Not implemented",
-        ))))))
-    } 
 }
 
 // make an iterator of RecordBatches 

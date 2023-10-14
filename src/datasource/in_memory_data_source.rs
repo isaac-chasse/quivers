@@ -27,7 +27,7 @@ impl DataSource for InMemoryDataSource {
 
         let data = self.data.clone(); 
         let iter = data.into_iter().map(move |batch| {
-            let columns = projection_indicies.iter().map(|&i| batch.field(i)).collect();
+            let columns = projection_indicies.iter().map(|&i| batch.field(i).clone()).collect();
             RecordBatch::new(schema.clone(), columns)
         });
 

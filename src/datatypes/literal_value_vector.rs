@@ -38,8 +38,24 @@ impl ColumnVector for LiteralValueVector {
         self.value.as_ref().map(|v|
             match &self.arrow_type {
                 DataType::Boolean => {
-                    let val: &bool = v.downcast_ref().expect("Invalid value type");
+                    let val: &bool = v.downcast_ref().expect("Invalid value type, expected bool");
                     Box::new(*val) as Box<dyn Any>
+                }
+                DataType::Int64 => {
+                    let val: &i64 = v.downcast_ref().expect("Invalid value type, expected i64");
+                    Box::new(*val) as Box<dyn Any>
+                }
+                DataType::UInt64 => {
+                    let val: &u64 = v.downcast_ref().expect("Invalid value type, expected u64");
+                    Box::new(*val) as Box<dyn Any>
+                }
+                DataType::Float64 => {
+                    let val: &f64 = v.downcast_ref().expect("Invalid value type, expected f64");
+                    Box::new(*val) as Box<dyn Any>
+                }
+                DataType::Utf8 => {
+                    let val: &String = v.downcast_ref().expect("Invalid value type, expected String");
+                    Box::new(val.clone()) as Box<dyn Any>
                 }
                 _ => panic!("Unsupported Arrow data type found!")
             }
@@ -83,5 +99,38 @@ impl Clone for LiteralValueVector {
             }),
             size: self.size,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_type() {
+        let vector = LiteralValueVector::new(DataType::Int64, Some(Box::new(42i64) as Box<dyn Any>), 1);
+        assert_eq!(vector.get_type(), DataType::Int64);
+    }
+
+    #[test]
+    fn test_get_value_at_valid_index() {
+        let value = 42i64;
+        let vector = LiteralValueVector::new(DataType::Int64, Some(Box::new(value) as Box<dyn Any>), 1);
+        
+        let result = vector.get_value(0);
+        assert!(result.is_some());
+        
+        let boxed_value = result.unwrap();
+        let retrieved_value = *boxed_value.downcast_ref::<i64>().unwrap();
+        assert_eq!(retrieved_value, value);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_get_value_at_invalid_index() {
+        let vector = LiteralValueVector::new(DataType::Int64, Some(Box::new(42i64) as Box<dyn Any>), 1);
+        
+        // this *should* panic since we are grabbing a value from idx[1] when max(idx) = 0
+        let _result = vector.get_value(1);
     }
 }
