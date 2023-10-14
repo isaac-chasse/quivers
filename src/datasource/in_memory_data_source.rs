@@ -1,4 +1,4 @@
-use crate::datatypes::{schema::Schema, record_batch::RecordBatch};
+use crate::datatypes::{record_batch::RecordBatch, schema::Schema};
 
 use super::DataSource;
 
@@ -25,9 +25,12 @@ impl DataSource for InMemoryDataSource {
             .map(|name| schema.fields.iter().position(|f| f.name == *name).unwrap())
             .collect::<Vec<_>>();
 
-        let data = self.data.clone(); 
+        let data = self.data.clone();
         let iter = data.into_iter().map(move |batch| {
-            let columns = projection_indicies.iter().map(|&i| batch.field(i).clone()).collect();
+            let columns = projection_indicies
+                .iter()
+                .map(|&i| batch.field(i).clone())
+                .collect();
             RecordBatch::new(schema.clone(), columns)
         });
 

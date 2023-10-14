@@ -1,6 +1,9 @@
-use std::fs::File;
+use crate::datatypes::{
+    record_batch::RecordBatch,
+    schema::{Field, Schema},
+};
 use arrow::datatypes::DataType;
-use crate::datatypes::{schema::{Schema, Field}, record_batch::RecordBatch};
+use std::fs::File;
 
 use super::DataSource;
 
@@ -16,7 +19,9 @@ impl DataSource for CsvDataSource {
         match &self.schema {
             Some(existing_schema) => existing_schema.clone(),
             None => {
-                let inferred_schema = self.infer_schema().expect("Failed to infer schema from CsvDataSource");
+                let inferred_schema = self
+                    .infer_schema()
+                    .expect("Failed to infer schema from CsvDataSource");
                 // NOTE: Could store the inferred schema to self.schema if it makes sense later
                 inferred_schema
             }
@@ -24,18 +29,28 @@ impl DataSource for CsvDataSource {
     }
 
     fn scan(&self, projection: Vec<String>) -> Box<dyn Iterator<Item = RecordBatch>> {
-        todo!()        
+        todo!()
     }
 }
 
 impl CsvDataSource {
-    pub fn new(filename: String, schema: Option<Schema>, has_headers: bool, batch_size: usize) -> Self {
-        CsvDataSource { filename, schema, has_headers, batch_size }
+    pub fn new(
+        filename: String,
+        schema: Option<Schema>,
+        has_headers: bool,
+        batch_size: usize,
+    ) -> Self {
+        CsvDataSource {
+            filename,
+            schema,
+            has_headers,
+            batch_size,
+        }
     }
 
     pub fn infer_schema(&self) -> Result<Schema, csv::Error> {
         // might want to specify error here if read fails
-        let file = File::open(&self.filename)?; 
+        let file = File::open(&self.filename)?;
         let mut rdr = csv::Reader::from_reader(file);
 
         // if we have headers, read them
@@ -45,7 +60,9 @@ impl CsvDataSource {
             // if we don't have headers default to "field_n" where n is field index
             // e.g. [field_0, field_1, field_2, ..., field_n]
             let field_count = rdr.records().next().unwrap()?.len();
-            (0..field_count).map(|n| format!("field_{}", n + 1)).collect()
+            (0..field_count)
+                .map(|n| format!("field_{}", n + 1))
+                .collect()
         };
 
         let fields = headers
@@ -57,9 +74,8 @@ impl CsvDataSource {
     }
 }
 
-// make an iterator of RecordBatches 
-fn reader_as_sequence() {} 
+// make an iterator of RecordBatches
+fn reader_as_sequence() {}
 
-// make a reader an iterator 
+// make a reader an iterator
 fn reader_iterator() {}
-

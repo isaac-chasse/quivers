@@ -18,9 +18,7 @@ impl RecordBatch {
         // Since we unwrap_or(0) here we can possibly experience cases where there is no first value
         // within [`RecordBatch::fields`]. We need to handle this case and possibly create a
         // `EmptyFieldError`. Currently we just throw a 0 row count.
-        self.fields.first()
-            .map(|column| column.len())
-            .unwrap_or(0)
+        self.fields.first().map(|column| column.len()).unwrap_or(0)
     }
 
     /// Returns the column count for a [`RecordBatch`]
@@ -31,17 +29,5 @@ impl RecordBatch {
     /// Access one columnn by index within a [`RecordBatch`]
     pub fn field(&self, i: usize) -> &Box<dyn ColumnVector> {
         &self.fields[i]
-    }
-}
-
-// Code useful for testing
-impl RecordBatch {
-    // file I/O to CSV
-    fn to_csv() {
-        todo!()
-    }
-    // to String
-    fn to_string() {
-        todo!()
     }
 }

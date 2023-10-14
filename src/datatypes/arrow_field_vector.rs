@@ -1,4 +1,7 @@
-use arrow::{array::{ArrayRef, BooleanArray, Int64Array, UInt64Array, Float64Array, StringArray}, datatypes::DataType};
+use arrow::{
+    array::{ArrayRef, BooleanArray, Float64Array, Int64Array, StringArray, UInt64Array},
+    datatypes::DataType,
+};
 
 pub struct ArrowFieldVector {
     pub field: ArrayRef,
@@ -14,18 +17,49 @@ impl ArrowFieldVector {
     }
 
     pub fn get_value(&self, i: usize) -> Option<ArrowPrimitive> {
-       if self.field.is_null(i) {
-           return None
-       }
+        if self.field.is_null(i) {
+            return None;
+        }
 
-       Some(match self.field.data_type() {
-           DataType::Boolean => ArrowPrimitive::Bool(self.field.as_any().downcast_ref::<BooleanArray>().unwrap().value(i)),
-           DataType::Int64 => ArrowPrimitive::I64(self.field.as_any().downcast_ref::<Int64Array>().unwrap().value(i)),
-           DataType::UInt64 => ArrowPrimitive::U64(self.field.as_any().downcast_ref::<UInt64Array>().unwrap().value(i)),
-           DataType::Float64 => ArrowPrimitive::F64(self.field.as_any().downcast_ref::<Float64Array>().unwrap().value(i)),
-           DataType::Utf8 => ArrowPrimitive::String(self.field.as_any().downcast_ref::<StringArray>().unwrap().value(i).to_string()),
-           _ => unimplemented!("Found an unimplemented Arrow primitive type!")
-       })
+        Some(match self.field.data_type() {
+            DataType::Boolean => ArrowPrimitive::Bool(
+                self.field
+                    .as_any()
+                    .downcast_ref::<BooleanArray>()
+                    .unwrap()
+                    .value(i),
+            ),
+            DataType::Int64 => ArrowPrimitive::I64(
+                self.field
+                    .as_any()
+                    .downcast_ref::<Int64Array>()
+                    .unwrap()
+                    .value(i),
+            ),
+            DataType::UInt64 => ArrowPrimitive::U64(
+                self.field
+                    .as_any()
+                    .downcast_ref::<UInt64Array>()
+                    .unwrap()
+                    .value(i),
+            ),
+            DataType::Float64 => ArrowPrimitive::F64(
+                self.field
+                    .as_any()
+                    .downcast_ref::<Float64Array>()
+                    .unwrap()
+                    .value(i),
+            ),
+            DataType::Utf8 => ArrowPrimitive::String(
+                self.field
+                    .as_any()
+                    .downcast_ref::<StringArray>()
+                    .unwrap()
+                    .value(i)
+                    .to_string(),
+            ),
+            _ => unimplemented!("Found an unimplemented Arrow primitive type!"),
+        })
     }
 
     pub fn len(&self) -> usize {
@@ -46,6 +80,6 @@ pub enum ArrowPrimitive {
     String(String),
 }
 
-// This code is going to be used later for when we are performing ops on 
+// This code is going to be used later for when we are performing ops on
 // Arrow fields (e.g. String ops, math ops on ints/float, etc.)
 // struct FieldVectorFactory;

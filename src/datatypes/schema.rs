@@ -37,7 +37,7 @@ impl Schema {
     pub fn select(&self, names: &[String]) -> Result<Schema, &'static str> {
         let mut fields = Vec::new();
         let available_names: HashSet<_> = self.fields.iter().map(|f| &f.name).collect();
-        
+
         for name in names {
             if available_names.contains(name) {
                 fields.push(

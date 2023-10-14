@@ -2,7 +2,7 @@
 /// Arrow data types.
 pub mod arrow_types;
 
-/// Provides a wrapper around the Arrow's Field vector. 
+/// Provides a wrapper around the Arrow's Field vector.
 pub mod arrow_field_vector;
 
 /// Builder for Arrow field vectors
